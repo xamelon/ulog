@@ -7,53 +7,53 @@ class ULog {
   bool colorOutputEnabled = true;
   ULog._();
 
-  void logWarn(String message) {
-    Message logMessage = Message(LogLevel.warn, message, DateTime.now());
-    _printMessageHeader(logMessage);
+  Map<String, Message> networkMessages = new Map<String, Message>();
+
+  Storage _storage = Storage();
+
+  String getLastMessages(int count, [LogLevel level]) {
+    return _storage.getLast(count, level).fold(" ", (String prev, elem) {
+      prev += "\n";
+      prev += elem.messageHeader;
+      return prev;
+    });
   }
 
-  void logError(String message, [dynamic error]) {
+  void logWarn(String message) {
+    Message logMessage = Message(LogLevel.warn, message, DateTime.now());
+    _storage.addMessage(logMessage);
+    print(logMessage.messageHeader);
+  }
+
+  void logError(String message, [Exception error]) {
     Message logMessage = Message(LogLevel.error, message, DateTime.now());
-    _printMessageHeader(logMessage);
+    _storage.addMessage(logMessage);
+    print(logMessage.messageHeader);
   }
 
   void logSuccess(String message) {
     Message logMessage = Message(LogLevel.success, message, DateTime.now());
-    _printMessageHeader(logMessage);
+    _storage.addMessage(logMessage);
+    print(logMessage.messageHeader);
   }
 
   void logInfo(String message) {
     Message logMessage = Message(LogLevel.info, message, DateTime.now());
-    _printMessageHeader(logMessage);
+    _storage.addMessage(logMessage);
+    print(logMessage.messageHeader);
   }
 
-  void _printMessageHeader(Message logMessage) {
-    String message = "";
-    if (colorOutputEnabled) message += colorForLogLevel(logMessage.logLevel);
-    message += formatDate(logMessage.time);
-    message += logMessage.message;
-    print(message);
-    print(Colors.reset);
+  void logNetworkBegin(String endpoint, NetworkMethod method) {
+    Message logMessage =
+        NetworkMessage(LogLevel.info, DateTime.now(), method, endpoint);
+    _storage.addMessage(logMessage);
+    print(logMessage.messageHeader);
   }
 
-  String formatDate(DateTime time) {
-    String result = time.day.toString();
-    result += ".${time.month.toString()}";
-    result += ".${time.year.toString()} ";
-    result += "${time.hour}:${time.minute}:${time.millisecond} ";
-    return result;
-  }
-
-  String colorForLogLevel(LogLevel level) {
-    switch (level) {
-      case LogLevel.info:
-        return Colors.reset;
-      case LogLevel.warn:
-        return Colors.yellow;
-      case LogLevel.error:
-        return Colors.red;
-      case LogLevel.success:
-        return Colors.green;
-    }
+  void logNetworkEnd(String endpoint, NetworkMethod method) {
+    Message logMessage =
+        NetworkMessage(LogLevel.info, DateTime.now(), method, endpoint);
+    _storage.addMessage(logMessage);
+    print(logMessage.messageHeader);
   }
 }

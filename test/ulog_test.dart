@@ -18,4 +18,13 @@ void main() {
   test("log info with green color", () {
     ULog.u.logInfo("-> GET /api/patient");
   });
+
+  test("log network info", () {
+    ULog.u.logNetworkBegin("ShoppingCart", NetworkMethod.get);
+  });
+
+  test("get last 5 messages", () {
+    String messages = ULog.u.getLastMessages(5);
+    print(messages);
+  });
 }

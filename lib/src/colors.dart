@@ -7,7 +7,7 @@ class Colors {
 
   static const yellow = "\x1B[33m";
 
-  static const reset = "\x1B";
+  static const reset = "\u001b[0m";
 
   Colors._();
 }
